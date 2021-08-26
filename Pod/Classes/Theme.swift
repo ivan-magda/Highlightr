@@ -40,6 +40,8 @@ open class Theme {
     
     private var themeDict : RPThemeDict!
     private var strippedTheme : RPThemeStringDict!
+
+    private let themeDictLock = NSLock()
     
     /// Default background color for the current theme.
     open var themeBackgroundColor : RPColor!
@@ -139,7 +141,10 @@ open class Theme {
             attrs[.font] = codeFont
             for style in styleList
             {
-                if let themeStyle = themeDict[style] as? [AttributedStringKey: Any]
+                themeDictLock.lock()
+                let themeStyleOrNil = themeDict[style] as? [AttributedStringKey: Any]
+                themeDictLock.unlock()
+                if let themeStyle = themeStyleOrNil
                 {
                     for (attrName, attrValue) in themeStyle
                     {
